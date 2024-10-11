@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Difference Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(145deg, #6dd5ed, #2193b0);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+        }
+
+        .calculator-container {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 350px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 28px;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: #f1c40f;
+        }
+
+        label {
+            display: block;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #f1c40f;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        @media (max-width: 400px) {
+            .calculator-container {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator-container">
+        <h2>Time Difference Calculator</h2>
+
+        <label for="startHour">Start Hour:</label>
+        <input type="number" id="startHour" min="1" max="12" required>
+
+        <label for="startMinute">Start Minute:</label>
+        <input type="number" id="startMinute" min="0" max="59" required>
+
+        <label for="startPeriod">AM/PM:</label>
+        <select id="startPeriod"></select>
+
+        <label for="endHour">End Hour:</label>
+        <input type="number" id="endHour" min="1" max="12" required>
+
+        <label for="endMinute">End Minute:</label>
+        <input type="number" id="endMinute" min="0" max="59" required>
+
+        <label for="endPeriod">AM/PM:</label>
+        <select id="endPeriod"></select>
+
+        <button onclick="calculateTime()">Calculate Difference</button>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        // Function to set the current time in the inputs
+        window.onload = function() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const hour12 = hours % 12 === 0 ? 12 : hours % 12; // Convert to 12-hour format
+            const period = hours >= 12 ? 'PM' : 'AM'; // Determine AM/PM
+
+            // Set values for start time
+            document.getElementById('startHour').value = hour12;
+            document.getElementById('startMinute').value = String(minutes).padStart(2, '0');
+            document.getElementById('startPeriod').innerHTML = `<option value="${period}">${period}</option>`;
+
+            // Set values for end time
+            document.getElementById('endHour').value = hour12;
+            document.getElementById('endMinute').value = String(minutes).padStart(2, '0');
+            document.getElementById('endPeriod').innerHTML = `<option value="${period}">${period}</option>`;
+        };
+
+        function calculateTime() {
+            const startHour = parseInt(document.getElementById('startHour').value);
+            const startMinute = parseInt(document.getElementById('startMinute').value);
+            const startPeriod = document.getElementById('startPeriod').value;
+
+            const endHour = parseInt(document.getElementById('endHour').value);
+            const endMinute = parseInt(document.getElementById('endMinute').value);
+            const endPeriod = document.getElementById('endPeriod').value;
+
+            // Convert 12-hour format to 24-hour format
+            const start24Hour = startPeriod === 'PM' ? (startHour % 12) + 12 : (startHour % 12);
+            const end24Hour = endPeriod === 'PM' ? (endHour % 12) + 12 : (endHour % 12);
+
+            // Create Date objects for start and end times
+            const startDateTime = new Date();
+            startDateTime.setHours(start24Hour, startMinute, 0, 0);
+
+            const endDateTime = new Date();
+            endDateTime.setHours(end24Hour, endMinute, 0, 0);
+
+            // Calculate time difference in milliseconds
+            let timeDifference = endDateTime - startDateTime;
+
+            // If timeDifference is negative, it means end time is on the next day
+            if (timeDifference < 0) {
+                timeDifference += 24 * 60 * 60 * 1000; // Add 24 hours
+            }
+
+            // Convert milliseconds to minutes
+            const minutesDifference = Math.floor(timeDifference / 60000);
+            const hours = Math.floor(minutesDifference / 60);
+            const minutes = minutesDifference % 60;
+
+            // Display the result
+            document.getElementById('result').textContent = `Time Difference: ${hours} hour(s) and ${minutes} minute(s)`;
+        }
+    </script>
+
+</body>
+</html>
